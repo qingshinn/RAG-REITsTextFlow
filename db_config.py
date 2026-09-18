@@ -1,18 +1,32 @@
 # db_config.py
 
+def get_db_config():
+    """
+    返回 MySQL 数据库全量数据连接的配置信息。
+    """
+    db_base_config = {
+        'host': '127.0.0.1',          # 数据库主机 (WSL本地)
+        'port': 3306,                 # 数据库端口
+        'user': 'root',               # 数据库用户名 (compose 中未修改，默认为 root)
+        'password': 'root_password',  # 【修改】对应 MYSQL_ROOT_PASSWORD
+        'database': 'reits_db',       # 【修改】对应 MYSQL_DATABASE
+        'charset': 'utf8mb4',         # 字符集
+        'init_command': "SET SESSION collation_connection = 'utf8mb4_unicode_ci'" # 设置连接排序
+    }
+    return db_base_config
 
 def get_db_announcement_config():
     """
     返回 MySQL 数据库announcement连接的配置信息。
     """
     db_announcement_config = {
-        'host': '127.0.0.1',       # 数据库主机
-        'port': 3306,               # 数据库端口
-        'user': 'root',              # 数据库用户名
-        'password': 'YOUR_MYSQL_PASSWORD',        # 数据库密码
-        'database': 'announcement',         # 数据库名称
-        'charset': 'utf8mb4',        # 字符集
-        'init_command': "SET SESSION collation_connection = 'utf8mb4_unicode_ci'"  # 设置连接排序规则
+        'host': '127.0.0.1',          # 数据库主机 (WSL本地)
+        'port': 3306,                 # 数据库端口
+        'user': 'root',               # 数据库用户名 (compose 中未修改，默认为 root)
+        'password': 'root_password',  # 【修改】对应 MYSQL_ROOT_PASSWORD
+        'database': 'reits_db',       # 【修改】对应 MYSQL_DATABASE
+        'charset': 'utf8mb4',         # 字符集
+        'init_command': "SET SESSION collation_connection = 'utf8mb4_unicode_ci'" # 设置连接排序
     }
     return db_announcement_config
 

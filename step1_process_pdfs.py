@@ -45,9 +45,9 @@ def get_announcement_info_from_mysql(announcement_title, fund_code, date):
         conn = pymysql.connect(**db_conf)
         cursor = conn.cursor()
         sql = """
-        SELECT 公告类型_一级, 公告类型_二级, 公告链接
-        FROM 公告信息
-        WHERE 公告标题 = %s AND 基金代码 = %s AND 公告日期 = %s
+        SELECT doc_type_1, doc_type_2, announcement_title
+        FROM files_info
+        WHERE announcement_title = %s AND fund_code = %s AND date = %s
         """
         cursor.execute(sql, (announcement_title, fund_code, date))
         row = cursor.fetchone()

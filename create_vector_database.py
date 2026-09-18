@@ -5,6 +5,7 @@
 create_vector_database.py
 """
 
+import argparse
 from pymilvus import (
     connections,
     Collection,
@@ -15,6 +16,12 @@ from pymilvus import (
     IndexType
 )
 from db_config import get_vector_db_config
+
+# 【新增】设置命令行参数
+parser = argparse.ArgumentParser(description="创建 Milvus 向量数据库集合")
+parser.add_argument('--force', action='store_true', 
+                    help='【危险】强制删除已存在的集合并重建，会清空所有向量数据！')
+args = parser.parse_args()
 
 # 获取向量数据库配置
 vector_db_config = get_vector_db_config()
@@ -93,17 +100,24 @@ print("正在连接到 Milvus 集群...")
 connections.connect(alias="default", host=HOST, port=PORT)
 print("连接成功！")
 
-# 3) 检查是否存在同名 Collection，如存在则删除
+# 3) 检查是否存在同名 Collection
+# 【修改】加入安全机制判断
 existing_collections = utility.list_collections()
 if COLLECTION_NAME in existing_collections:
-    print(f"集合 '{COLLECTION_NAME}' 已存在，正在删除...")
-    coll = Collection(name=COLLECTION_NAME)
-    coll.drop()
-    print("删除成功！")
+    if args.force:
+        print(f"⚠️ 检测到 --force 参数，正在强制删除已存在的集合: '{COLLECTION_NAME}'...")
+        coll = Collection(name=COLLECTION_NAME)
+        coll.drop()
+        print("删除成功！")
+    else:
+        print(f"⏭️ 集合 '{COLLECTION_NAME}' 已存在。为了保护数据，未做任何操作。")
+        print("👉 如果你确实想重建（会清空所有向量数据），请加上 --force 参数运行。")
+        exit(0)  # 安全退出，不执行后面的创建逻辑
 else:
     print(f"集合 '{COLLECTION_NAME}' 不存在，无需删除。")
 
 # 4) 创建新的 Collection
+# （只有集合不存在，或者带了 --force 被删除后，才会走到这里）
 print(f"正在创建集合: {COLLECTION_NAME} ...")
 collection = Collection(name=COLLECTION_NAME, schema=schema)
 print(f"集合 '{COLLECTION_NAME}' 创建成功！")
