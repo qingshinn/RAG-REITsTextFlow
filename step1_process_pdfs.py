@@ -45,7 +45,7 @@ def get_announcement_info_from_mysql(announcement_title, fund_code, date):
         conn = pymysql.connect(**db_conf)
         cursor = conn.cursor()
         sql = """
-        SELECT doc_type_1, doc_type_2, announcement_title
+        SELECT doc_type_1, doc_type_2, announcement_link
         FROM files_info
         WHERE announcement_title = %s AND fund_code = %s AND date = %s
         """
