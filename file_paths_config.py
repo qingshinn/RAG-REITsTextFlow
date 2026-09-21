@@ -5,7 +5,7 @@
 PDF_DIR = r"/home/qingshinn/files/reits/download_files"
 
 # 输出文件夹路径
-OUTPUT_DIR = r"***/announcement_document_processing/"
+OUTPUT_DIR = r"/home/qingshinn/files/reits/output_files"
 
 
 #table_transformer模型路径

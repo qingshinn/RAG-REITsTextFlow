@@ -4,6 +4,12 @@
 step2_a_extract_text_onlyvactor_multi_process.py
 文本提取，多进程处理
 
+存档示例如下：
+目标文件夹/180501.SZ/2026-04-21_180501.SZ_红土创新深圳安居REIT_红土创新深圳安居保障性租赁住房封闭式基础设施证券投资基金
+2026年第1季度报告/
+若为矢量文本，直接存档在text.json
+否则转为图片，存档在temp_pdf_images文件夹下以每页图片格式保存
+
 """
 
 import os
@@ -131,7 +137,7 @@ def clean_and_reorganize_text(text: str, title_max_length: int = 30) -> str:
 
 def get_cropped_bbox(pdf_page, top_ratio=0.08, bottom_ratio=0.08):
     """
-    返回裁剪掉页眉和页脚的区域，用于矢量文字提取。
+    返回裁剪掉页眉和页脚的区域，用于矢量文字提取。这个相当于去掉下面8%的部分，去掉上边8%的部分。
     """
     parent_bbox = pdf_page.bbox
     px0, py0, px1, py1 = parent_bbox
@@ -154,9 +160,11 @@ def extract_text_from_vector_page(pdf_page) -> str:
 
 def is_header_or_footer(text: str) -> bool:
     """
-    判断文本是否仅是页眉/页脚（如只有页码等）。
+    判断文本是否仅是页眉/页脚（如只有页码等）。当前仅处理只有页面的情形。
     """
-    return re.match(r'^\d+$', text.strip()) is not None
+    # 匹配纯数字，或 "第1页"、"第1页/共10页"、"Page 1"、"1/10" 等常见页码格式
+    pattern = r'^(第\s*\d+\s*页(\s*[/|共]\s*\d+\s*页)?|\d+\s*[/|of]\s*\d+|Page\s*\d+(\s*of\s*\d+)?|\d+)$'
+    return re.match(pattern, text, re.IGNORECASE) is not None
 
 
 def convert_scanned_page_to_image(pdf_path: str, page_number: int, dpi: int, temp_img_dir: str) -> None:
@@ -333,7 +341,7 @@ def process_single_file(args):
 
 
 def main():
-    log_file_name = os.path.join(SCRIPT_DIR, "extract_text_onlyvactor_log.txt")
+    log_file_name = os.path.join(LOG_DIR, "extract_text_onlyvactor_subprocess.log")
 
     # 从数据库读取待处理文件
     try:
