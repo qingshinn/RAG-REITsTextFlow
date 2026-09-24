@@ -8,7 +8,6 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: root_password
       MYSQL_DATABASE: reits_db
-    # 加上这一行，5.7 也能完美支持中文
     command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     volumes:
       - ./docker_data/mysql:/var/lib/mysql
@@ -54,8 +53,24 @@ services:
     network_mode: "host"
     command: ["milvus", "run", "standalone"]
     environment:
-      # 【极其关键】这里必须改成 127.0.0.1，不能写 etcd 和 minio
       ETCD_ENDPOINTS: 127.0.0.1:2379
       MINIO_ADDRESS: 127.0.0.1:9000
     volumes:
       - ./docker_data/milvus:/var/lib/milvus
+
+  # ================= 新增 MinerU CPU 服务 =================
+  # mineru:
+  #   image: localhost/mineru-cpu:latest
+  #   container_name: reits_mineru
+  #   network_mode: "host"
+  #   restart: unless-stopped
+  #   environment:
+  #     - MINERU_DEVICE_MODE=cpu
+  #     - CUDA_VISIBLE_DEVICES=""
+  #     - MINERU_MODEL_SOURCE=local
+  #   # 【关键】挂载刚才成功下载的模型目录，宿主机相对路径 -> 容器内的 /root/.mineru
+  #   volumes:
+  #     - ./docker_data/mineru4_models:/root/.mineru
+  #   # 启动命令，不要加 --backend 和 --device
+  #   command: mineru-api --host 0.0.0.0 --port 8000
+  #   # 【警告】千万不要在这里写 cpus 和 mem_limit，podman-compose 会报错！

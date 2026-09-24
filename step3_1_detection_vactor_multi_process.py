@@ -199,7 +199,7 @@ def process_pdf(pdf_path, output_dir):
             has_table, bboxes = detect_tables_in_page(pdf_path, pg_i)
             img_path = None
             if has_table:
-                img_path = convert_pdf_page_to_image(pdf_path, pg_i, output_dir)
+                img_path = convert_pdf_page_to_image(pdf_path, pg_i, output_dir)  # 矢量文本表格保存为图片格式备查？
             else:
                 logger.info("  本页未检测到表格,跳过生成图片")
             page_height = page.height
@@ -216,10 +216,10 @@ def process_pdf(pdf_path, output_dir):
             })
 
     i = 0
-    while i < len(table_info_list) - 1:
+    while i < len(table_info_list) - 1:  # 这里确定图片一次性所有的页面跨长度，直至某一页无图
         pending_merge = []
         merged_pages = []
-        while i < len(table_info_list) - 1:
+        while i < len(table_info_list) - 1: # 上一层的while用来确定每一个新起点，这个while用来确定截止点
             current = table_info_list[i]
             nxt = table_info_list[i+1]
             logger.info(f"检查跨页表格: 第{i+1}页 与 第{i+2}页")
@@ -228,7 +228,7 @@ def process_pdf(pdf_path, output_dir):
                 current_height = current["page_height"]
                 next_first_bbox = nxt["first_bbox"]
 
-                if current_last_bbox:
+                if current_last_bbox: # 该库读的表坐标，0坐标是左上角，然后严格对应（左，上，右，下）
                     dist_current = current_height - current_last_bbox[3]
                 else:
                     dist_current = 99999
@@ -376,7 +376,7 @@ def main():
 
     # 全部成功 => 提示
     if remain == 0:
-        msg = "矢量表格检测全部完成！状态以更新至数据库中。"
+        msg = "矢量表格检测全部完成！状态已更新至数据库中。"
         logger.info(msg)
         print(msg)
     else:
